@@ -2,7 +2,8 @@ pipeline {
     agent {
         docker {
             image 'maven:3.9.2'
-            args '-v /var/jenkins_home/.m2:/root/.m2 -v ${PWD}:/app'
+            args '-v /var/jenkins_home/.m2:/root/.m2 --user root'
+            reuseNode true
         }
     }
     environment {
@@ -11,9 +12,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                dir('/app') {
-                    sh 'mvn -B -DskipTests clean package'
-                }
+                sh 'mvn -B -DskipTests clean package'
             }
         }
 
