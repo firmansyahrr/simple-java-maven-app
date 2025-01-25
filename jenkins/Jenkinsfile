@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'maven:3.9.2'
-            args '-v /var/jenkins_home/.m2:/root/.m2 --dns 8.8.8.8 --dns 8.8.4.4'
+            args '-v /var/jenkins_home/.m2:/root/.m2 --user root --dns 8.8.8.8 --dns 8.8.4.4'
             reuseNode true
         }
     }
