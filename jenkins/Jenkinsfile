@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'maven:3.9.2'
-            args '-v D:/.m2:/root/.m2'
+            args '--mount source=maven-repo,target=/root/.m2'
         }
     }
     stages {
