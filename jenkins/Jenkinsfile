@@ -1,35 +1,32 @@
-pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.2'
-            args '-v /var/jenkins_home/.m2:/root/.m2 --user root --dns 8.8.8.8 --dns 8.8.4.4'
-            reuseNode true
-        }
-    }
+node {
+    def mvnImage = 'maven:3.9.2'
+    def mvnArgs = '-v /var/jenkins_home/.m2:/root/.m2 --user root --dns 8.8.8.8 --dns 8.8.4.4'
+    
     environment {
         MAVEN_OPTS = '-Dmaven.repo.local=/root/.m2/repository'
     }
-    stages {
-        stage('Build') {
-            steps {
-                sh 'mvn -B -DskipTests clean package'
-            }
+    
+    stage('Build') {
+        docker.image(mvnImage).inside(mvnArgs) {
+            sh 'mvn -B -DskipTests clean package'
         }
-
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
+    }
+    
+    stage('Test') {
+        docker.image(mvnImage).inside(mvnArgs) {
+            sh 'mvn test'
         }
-        stage('Deliver') {
-            steps {
-                sh './jenkins/scripts/deliver.sh'
-            }
+    }
+    
+    stage('Post Test Actions') {
+        docker.image(mvnImage).inside(mvnArgs) {
+            junit 'target/surefire-reports/*.xml'
+        }
+    }
+    
+    stage('Deliver') {
+        docker.image(mvnImage).inside(mvnArgs) {
+            sh './jenkins/scripts/deliver.sh'
         }
     }
 }
