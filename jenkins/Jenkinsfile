@@ -26,6 +26,7 @@ node {
         stage('Deliver') {
             docker.image(mvnImage).inside(mvnArgs) {
                 sh './jenkins/scripts/deliver.sh'
+                sh 'ls -la'
             }
         }
     } catch (Exception e) {
