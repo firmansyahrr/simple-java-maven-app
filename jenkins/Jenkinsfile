@@ -2,31 +2,35 @@ node {
     def mvnImage = 'maven:3.9.2'
     def mvnArgs = '-v /var/jenkins_home/.m2:/root/.m2 --user root --dns 8.8.8.8 --dns 8.8.4.4'
     
-    environment {
-        MAVEN_OPTS = '-Dmaven.repo.local=/root/.m2/repository'
-    }
+    env.MAVEN_OPTS = '-Dmaven.repo.local=/root/.m2/repository'
     
-    stage('Build') {
-        docker.image(mvnImage).inside(mvnArgs) {
-            sh 'mvn -B -DskipTests clean package'
+    try {
+        stage('Build') {
+            docker.image(mvnImage).inside(mvnArgs) {
+                sh 'mvn -B -DskipTests clean package'
+            }
         }
-    }
-    
-    stage('Test') {
-        docker.image(mvnImage).inside(mvnArgs) {
-            sh 'mvn test'
+        
+        stage('Test') {
+            docker.image(mvnImage).inside(mvnArgs) {
+                sh 'mvn test'
+            }
         }
-    }
-    
-    stage('Post Test Actions') {
-        docker.image(mvnImage).inside(mvnArgs) {
-            junit 'target/surefire-reports/*.xml'
+        
+        stage('Post Test Actions') {
+            docker.image(mvnImage).inside(mvnArgs) {
+                junit 'target/surefire-reports/*.xml'
+            }
         }
-    }
-    
-    stage('Deliver') {
-        docker.image(mvnImage).inside(mvnArgs) {
-            sh './jenkins/scripts/deliver.sh'
+        
+        stage('Deliver') {
+            docker.image(mvnImage).inside(mvnArgs) {
+                sh './jenkins/scripts/deliver.sh'
+            }
         }
+    } catch (Exception e) {
+        echo "Pipeline failed: ${e.getMessage()}"
+        currentBuild.result = 'FAILURE'
+        throw e
     }
 }
