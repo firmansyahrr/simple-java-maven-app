@@ -37,7 +37,6 @@ node {
                 sh 'cd target && ls -la'
 
                 sh 'apt-get update && apt-get install -y openssh-client' // Untuk Debian-based image
-                sh 'apk add --no-cache openssh' // Jika menggunakan Alpine-based image
 
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh """
