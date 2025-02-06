@@ -35,6 +35,13 @@ node {
                 sh './jenkins/scripts/deliver.sh'
                 sh 'ls -la'
                 sh 'cd target && ls -la'
+
+                sshagent(credentials: ['ec2-ssh-key']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
+                        'pwd && cd target && ls -la'
+                    """
+                }
             }
         }
     } catch (Exception e) {
