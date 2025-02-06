@@ -36,14 +36,7 @@ node {
                 sh 'ls -la'
                 sh 'cd target && ls -la'
 
-                sh 'apt-get update && apt-get install -y openssh-client' // Untuk Debian-based image
-
-                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
-                    sh """
-                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
-                        'pwd && ls -la'
-                    """
-                }
+                sh 'apt-get update && apt-get install -y openssh-client'
 
                 sshagent(credentials: ['ec2-ssh-key']) {
                     sh """
