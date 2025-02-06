@@ -26,7 +26,7 @@ node {
         stage('Deploy') {
             withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                 sh """
-                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
+                    ssh -o StrictHostKeyChecking=no ${env.EC2_USER}@${env.EC2_HOST} \
                     'pwd && cd target && ls -la'
                 """
             }
